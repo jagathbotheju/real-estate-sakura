@@ -1,7 +1,7 @@
 import { BasicStepSchema } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PropertyStatus, PropertyType } from "@prisma/client";
+import { Property, PropertyStatus, PropertyType } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -23,31 +23,48 @@ import {
 } from "./ui/select";
 import { Button } from "./ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useEffect } from "react";
+import _ from "lodash";
+import { PropertyExt } from "@/types";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface Props {
   types: PropertyType[];
   statuses: PropertyStatus[];
   className?: string;
+  property?: PropertyExt | null | undefined;
   next: () => void;
+  setBasicStepData: (formData: z.infer<typeof BasicStepSchema>) => void;
 }
 
-const BasicStep = ({ types, statuses, className, next }: Props) => {
+const BasicStep = ({
+  types,
+  statuses,
+  className,
+  property,
+  next,
+  setBasicStepData,
+}: Props) => {
   const form = useForm<z.infer<typeof BasicStepSchema>>({
     resolver: zodResolver(BasicStepSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      type: "",
-      price: 0,
+      name: property ? property.name : "",
+      description: property ? property.description : "",
+      type:
+        property && property.propertyType ? property.propertyType.value : "",
+      status:
+        property && property.propertyStatus
+          ? property.propertyStatus.value
+          : "",
+      price: property ? property.price : 0,
     },
     mode: "all",
   });
 
   const onSubmit = (formData: z.infer<typeof BasicStepSchema>) => {
     console.log("BasicStep", formData);
+    setBasicStepData(formData);
   };
-
-  // console.log("BasicStep", types);
 
   return (
     <Form {...form}>
@@ -97,51 +114,64 @@ const BasicStep = ({ types, statuses, className, next }: Props) => {
             <FormField
               control={form.control}
               name="type"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Property Type</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Property Type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {types.map((type) => (
-                        <SelectItem key={type.id} value={type.value}>
-                          {type.value}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                // console.log("type field", field.value);
+                return (
+                  <FormItem className="w-full">
+                    <FormLabel>Property Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      value={
+                        property && property.propertyType
+                          ? property.propertyType.id
+                          : ""
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Property Type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {types.map((type) => (
+                          <SelectItem key={type.id} value={type.id}>
+                            {type.value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             {/* property status */}
             <FormField
               control={form.control}
-              name="type"
+              name="status"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>Property Status</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={
+                      property && property.propertyStatus
+                        ? property.propertyStatus.id
+                        : ""
+                    }
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select Property Type" />
+                        <SelectValue placeholder="Select Property Status" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {statuses.map((type) => (
-                        <SelectItem key={type.id} value={type.value}>
-                          {type.value}
+                      {statuses.map((status) => (
+                        <SelectItem key={status.id} value={status.id}>
+                          {status.value}
                         </SelectItem>
                       ))}
                     </SelectContent>

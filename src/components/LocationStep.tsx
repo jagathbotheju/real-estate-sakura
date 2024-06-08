@@ -22,9 +22,15 @@ interface Props {
   className?: string;
   next: () => void;
   back: () => void;
+  setLocationStepData: (formData: z.infer<typeof LocationStepSchema>) => void;
 }
 
-const LocationStep = ({ className, next, back }: Props) => {
+const LocationStep = ({
+  className,
+  next,
+  back,
+  setLocationStepData,
+}: Props) => {
   const form = useForm<z.infer<typeof LocationStepSchema>>({
     resolver: zodResolver(LocationStepSchema),
     defaultValues: {
@@ -39,7 +45,8 @@ const LocationStep = ({ className, next, back }: Props) => {
   });
 
   const onSubmit = (formData: z.infer<typeof LocationStepSchema>) => {
-    console.log("LocationStep", formData);
+    setLocationStepData(formData);
+    next();
   };
 
   return (
@@ -160,12 +167,16 @@ const LocationStep = ({ className, next, back }: Props) => {
         />
 
         {/* buttons */}
-        <div className="flex gap-5 ml-auto">
+        <div className="flex gap-5 ml-auto col-span-2">
           <Button onClick={back}>
             <ChevronLeftIcon />
             Previous
           </Button>
-          <Button disabled={!form.formState.isValid} onClick={next}>
+          <Button
+            disabled={!form.formState.isValid}
+            // onClick={next}
+            type="submit"
+          >
             Next
             <ChevronRightIcon />
           </Button>

@@ -1,13 +1,21 @@
+import { auth } from "@/auth";
 import AddPropertyForm from "@/components/AddPropertyForm";
 import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
+import { User } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 const AddPropertyPage = async () => {
   const [propertyTypes, propertyStatuses] = await Promise.all([
     prisma.propertyType.findMany(),
     prisma.propertyStatus.findMany(),
   ]);
-  // const propertyTypes = await prisma.propertyType.findMany();
+  const session = await auth();
+  const user = session?.user as User;
+
+  if (!user) {
+    redirect("/auth/signin");
+  }
 
   return (
     <div className="flex container px-20 mx-auto flex-col">
@@ -16,7 +24,11 @@ const AddPropertyPage = async () => {
         <Separator className="mt-5" />
       </div>
 
-      <AddPropertyForm types={propertyTypes} statuses={propertyStatuses} />
+      <AddPropertyForm
+        types={propertyTypes}
+        statuses={propertyStatuses}
+        user={user}
+      />
     </div>
   );
 };
