@@ -16,12 +16,14 @@ const AuthButton = async () => {
   const session = await auth();
   const user = session?.user as User;
 
+  console.log("AuthButton image", user.image);
+
   return (
     <div className="flex items-center gap-4">
       {user ? (
         <>
           <Link
-            href={`/profile/${user.id}`}
+            href={`/user/profile`}
             className="font-bold underline underline-offset-2 decoration-2 hover:decoration-sky-500"
           >
             {user.name}
@@ -43,6 +45,9 @@ const AuthButton = async () => {
                       : "/images/blank-profile.svg"
                   }
                 />
+                <AvatarFallback>
+                  <AvatarImage src="/images/blank-profile.svg" />
+                </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-36 dark:bg-slate-700">

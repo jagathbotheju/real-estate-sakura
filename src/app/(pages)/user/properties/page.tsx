@@ -59,15 +59,24 @@ const PropertiesPage = async ({ searchParams }: Props) => {
   const propertyTableData: PropertyTableData[] = [];
   properties.map((property) => {
     const data: PropertyTableData = {
+      id: property.id,
       name: property.name,
       price: formatPrice(property.price),
       type: property.propertyType.value,
+      typeData: property.propertyType,
       status: property.propertyStatus.value,
+      statusData: property.propertyStatus,
       userId: property.userId,
       propertyId: property.id,
+      images: property.images,
+      contact: property.contact,
+      location: property.propertyLocation,
+      feature: property.propertyFeature,
     };
     propertyTableData.push(data);
   });
+
+  // console.log("PropertiesPage", properties);
 
   return (
     <div className="flex container px-20 mx-auto">

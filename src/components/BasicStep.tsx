@@ -33,8 +33,11 @@ interface Props {
   statuses: PropertyStatus[];
   className?: string;
   property?: PropertyExt | null | undefined;
+  isEdit: boolean;
   next: () => void;
   setBasicStepData: (formData: z.infer<typeof BasicStepSchema>) => void;
+  setPropertyTypeData: (type: PropertyType) => void;
+  setPropertyStatusData: (type: PropertyStatus) => void;
 }
 
 const BasicStep = ({
@@ -43,27 +46,54 @@ const BasicStep = ({
   className,
   property,
   next,
+  isEdit,
   setBasicStepData,
+  setPropertyTypeData,
+  setPropertyStatusData,
 }: Props) => {
   const form = useForm<z.infer<typeof BasicStepSchema>>({
     resolver: zodResolver(BasicStepSchema),
     defaultValues: {
       name: property ? property.name : "",
       description: property ? property.description : "",
-      type:
-        property && property.propertyType ? property.propertyType.value : "",
+      type: property && property.propertyType ? property.propertyType.id : "",
       status:
-        property && property.propertyStatus
-          ? property.propertyStatus.value
-          : "",
+        property && property.propertyStatus ? property.propertyStatus.id : "",
       price: property ? property.price : 0,
     },
     mode: "all",
   });
 
   const onSubmit = (formData: z.infer<typeof BasicStepSchema>) => {
-    console.log("BasicStep", formData);
-    setBasicStepData(formData);
+    const type = types.find(
+      (type) => type.id === formData.type
+    ) as PropertyType;
+    const status = statuses.find(
+      (type) => type.id === formData.status
+    ) as PropertyStatus;
+
+    const dataCreate = {
+      name: formData.name,
+      description: formData.description,
+      type: types.find((item) => item.id === formData.type)?.id as string,
+      status: statuses.find((item) => item.id === formData.status)
+        ?.id as string,
+      price: formData.price,
+    };
+
+    const dataEdit = {
+      name: formData.name,
+      description: formData.description,
+      type: types.find((item) => item.id === formData.type)?.value as string,
+      status: statuses.find((item) => item.id === formData.status)
+        ?.value as string,
+      price: formData.price,
+    };
+
+    console.log("BasicStep - create ", dataCreate);
+    setBasicStepData(isEdit ? dataEdit : dataCreate);
+    setPropertyTypeData(type);
+    setPropertyStatusData(status);
   };
 
   return (
@@ -115,22 +145,21 @@ const BasicStep = ({
               control={form.control}
               name="type"
               render={({ field }) => {
-                // console.log("type field", field.value);
+                const fieldId = types.find(
+                  (type) => type.value === field.value
+                )?.id;
+
                 return (
                   <FormItem className="w-full">
                     <FormLabel>Property Type</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      value={
-                        property && property.propertyType
-                          ? property.propertyType.id
-                          : ""
-                      }
+                      value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select Property Type" />
+                          <SelectValue placeholder={"Select Property Type"} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -157,11 +186,7 @@ const BasicStep = ({
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    value={
-                      property && property.propertyStatus
-                        ? property.propertyStatus.id
-                        : ""
-                    }
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>

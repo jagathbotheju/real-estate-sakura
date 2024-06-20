@@ -11,6 +11,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model SubscriptionPlan{
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  price Float
+  propertyLimit Int
+  imagePerPropertyLimit Int
+  features String
+}
+
 model User {
   id            String     @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
@@ -32,8 +41,8 @@ model Contact{
   phone String
   email String
 
-  propertyId String @db.ObjectId @unique
-  Property Property @relation(fields: [propertyId],references: [id])
+  propertyId String? @db.ObjectId @unique
+  Property Property? @relation(fields: [propertyId],references: [id], onDelete: Cascade)
 }
 
 model Property {
@@ -62,8 +71,8 @@ model Property {
 model PropertyImage{
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   url String
-  propertyId String @db.ObjectId
-  property Property @relation(fields: [propertyId],references: [id])
+  propertyId String? @db.ObjectId
+  property Property? @relation(fields: [propertyId],references: [id],onDelete: Cascade)
 }
 
 model PropertyFeature{
@@ -75,8 +84,8 @@ model PropertyFeature{
   hasSwimmingPool Boolean
   hasGardenYard Boolean
   hasBalcony Boolean
-  propertyId String @db.ObjectId @unique
-  property Property @relation(fields: [propertyId],references: [id])
+  propertyId String? @db.ObjectId @unique
+  property Property? @relation(fields: [propertyId],references: [id],onDelete: Cascade)
 }
 
 model PropertyLocation {
@@ -87,8 +96,8 @@ model PropertyLocation {
   district   String
   province   String
   landmark   String
-  propertyId String @db.ObjectId @unique
-  property   Property @relation(fields: [propertyId], references: [id])
+  propertyId String? @db.ObjectId @unique
+  property   Property? @relation(fields: [propertyId], references: [id],onDelete: Cascade)
 }
 
 model PropertyType {

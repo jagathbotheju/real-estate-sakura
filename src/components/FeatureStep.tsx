@@ -16,25 +16,54 @@ import { Button } from "./ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "./ui/checkbox";
+import { PropertyExt } from "@/types";
 
 interface Props {
   className?: string;
   next: () => void;
   back: () => void;
+  property?: PropertyExt | null | undefined;
   setFeatureStepData: (formData: z.infer<typeof FeatureStepSchema>) => void;
 }
 
-const FeatureStep = ({ className, next, back, setFeatureStepData }: Props) => {
+const FeatureStep = ({
+  className,
+  next,
+  back,
+  setFeatureStepData,
+  property,
+}: Props) => {
   const form = useForm<z.infer<typeof FeatureStepSchema>>({
     resolver: zodResolver(FeatureStepSchema),
     defaultValues: {
-      bedrooms: 1,
-      bathrooms: 1,
-      parkingSpots: 1,
-      area: 0,
-      hasSwimmingPool: false,
-      hasGardenYard: false,
-      hasBalcony: false,
+      bedrooms:
+        property && property.propertyFeature
+          ? property.propertyFeature.bedrooms
+          : 1,
+      bathrooms:
+        property && property.propertyFeature
+          ? property.propertyFeature.bathrooms
+          : 1,
+      parkingSpots:
+        property && property.propertyFeature
+          ? property.propertyFeature.parkingSpots
+          : 1,
+      area:
+        property && property.propertyFeature
+          ? property.propertyFeature.area
+          : 0,
+      hasSwimmingPool:
+        property && property.propertyFeature
+          ? property.propertyFeature.hasSwimmingPool
+          : false,
+      hasGardenYard:
+        property && property.propertyFeature
+          ? property.propertyFeature.hasGardenYard
+          : false,
+      hasBalcony:
+        property && property.propertyFeature
+          ? property.propertyFeature.hasBalcony
+          : false,
     },
   });
 
@@ -179,7 +208,7 @@ const FeatureStep = ({ className, next, back, setFeatureStepData }: Props) => {
 
         {/* buttons */}
         <div className="flex gap-5 ml-auto">
-          <Button onClick={back}>
+          <Button onClick={back} type="button">
             <ChevronLeftIcon />
             Previous
           </Button>

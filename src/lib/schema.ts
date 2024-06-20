@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+export const SearchSchema = z.object({
+  searchTerm: z.string().min(1, "enter something to search"),
+});
+
 export const ContactStepSchema = z.object({
   name: z.string().min(1, "name is required"),
   phone: z.string().min(1, "phone i required"),

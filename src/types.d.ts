@@ -8,15 +8,20 @@ import {
   PropertyType,
 } from "@prisma/client";
 
-type PropertyFormData = Omit<Property, "userId", "typeId", "statusId">;
-
 type PropertyTableData = {
+  id: string;
   name: string;
   price: string;
   type: string;
+  typeData: PropertyType?;
   status: string;
+  statusData: PropertyStatus?;
   userId: string;
   propertyId: string;
+  images: PropertyImage[];
+  contact: Contact?;
+  location: PropertyLocation?;
+  feature: PropertyFeature?;
 };
 
 type PropertyExt = Property & {
@@ -27,3 +32,5 @@ type PropertyExt = Property & {
   images: PropertyImage[];
   contact: Contact;
 };
+
+type PropertyFormData = Omit<PropertyExt, "userId", "typeId", "statusId">;

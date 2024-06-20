@@ -38,6 +38,12 @@ const ProfilePage = async () => {
             </div>
           </div>
         </div>
+
+        <div className="flex flex-col border rounded-t-md mt-5 w-[70%] shadow-lg">
+          <h3 className="font-semibold text-lg bg-slate-200 p-3 text-muted-foreground">
+            Subscription Details
+          </h3>
+        </div>
       </div>
     </div>
   );

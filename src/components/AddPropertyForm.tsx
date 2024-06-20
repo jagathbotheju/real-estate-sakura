@@ -18,7 +18,7 @@ import {
   LocationStepSchema,
 } from "@/lib/schema";
 import { PropertyExt, PropertyFormData } from "@/types";
-import { createProperty } from "@/actions/propertyActions";
+import { createProperty, updateProperty } from "@/actions/propertyActions";
 import { toast } from "sonner";
 import _ from "lodash";
 import { useRouter } from "next/navigation";
@@ -36,7 +36,7 @@ interface Props {
   statuses: PropertyStatus[];
   user: User;
   property?: PropertyExt | null | undefined;
-  isEdit?: boolean;
+  isEdit: boolean;
 }
 
 const AddPropertyForm = ({
@@ -62,11 +62,55 @@ const AddPropertyForm = ({
   const [contactStepData, setContactStepData] = useState<z.infer<
     typeof ContactStepSchema
   > | null>();
+  const [imageIds, setImageIds] = useState<string[]>([]);
+  const [propertyTypeData, setPropertyTypeData] = useState<
+    PropertyType | undefined
+  >();
+  const [propertyStatusData, setPropertyStatusData] = useState<
+    PropertyStatus | undefined
+  >();
 
-  // console.log("AddPropertyForm, editing....", property);
+  // console.log("AddPropertyForm property...", property, isEdit);
+  // console.log("imageIds", imageIds);
 
   const formSubmit = (contactStepData: z.infer<typeof ContactStepSchema>) => {
     if (isEdit && !_.isEmpty(property)) {
+      if (
+        !_.isEmpty(basicStepData) &&
+        !_.isEmpty(locationStepData) &&
+        !_.isEmpty(featureStepData) &&
+        !_.isEmpty(contactStepData)
+      ) {
+        const formData: PropertyFormData = {
+          ...basicStepData,
+          id: property.id,
+          userId: user.id,
+          propertyType: basicStepData.type,
+          propertyStatus: basicStepData.status,
+          propertyLocation: { ...locationStepData },
+          propertyFeature: { ...featureStepData },
+          contact: { ...contactStepData },
+          images: images.map((image) => ({
+            url: image,
+          })),
+        };
+
+        startTransition(() => {
+          updateProperty({ formData, imageIds })
+            .then((res) => {
+              if (res.success) {
+                router.push("/user/properties");
+                return toast.success(res.message);
+              } else {
+                return toast.error(res.error);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              return toast.error(err.message);
+            });
+        });
+      }
     } else {
       if (
         !_.isEmpty(basicStepData) &&
@@ -87,6 +131,8 @@ const AddPropertyForm = ({
           propertyFeature: { ...featureStepData },
           contact: { ...contactStepData },
         };
+
+        console.log("Create Property", propertyTypeData);
 
         startTransition(() => {
           createProperty(propertyData)
@@ -115,10 +161,13 @@ const AddPropertyForm = ({
         className={cn({
           hidden: step !== 0,
         })}
+        isEdit={isEdit}
         next={() => setStep((prev) => prev + 1)}
         types={types}
         statuses={statuses}
         setBasicStepData={setBasicStepData}
+        setPropertyTypeData={setPropertyTypeData}
+        setPropertyStatusData={setPropertyStatusData}
         property={property}
       />
       <LocationStep
@@ -128,11 +177,13 @@ const AddPropertyForm = ({
         next={() => setStep((prev) => prev + 1)}
         back={() => setStep((prev) => prev - 1)}
         setLocationStepData={setLocationStepData}
+        property={property}
       />
       <FeatureStep
         className={cn({
           hidden: step !== 2,
         })}
+        property={property}
         next={() => setStep((prev) => prev + 1)}
         back={() => setStep((prev) => prev - 1)}
         setFeatureStepData={setFeatureStepData}
@@ -145,11 +196,15 @@ const AddPropertyForm = ({
         back={() => setStep((prev) => prev - 1)}
         images={images}
         setImages={setImages}
+        setImageIds={setImageIds}
+        property={property}
       />
       <ContactStep
         className={cn({
           hidden: step !== 4,
         })}
+        isEdit={false}
+        property={property}
         back={() => setStep((prev) => prev - 1)}
         setContactStepData={setContactStepData}
         formSubmit={formSubmit}

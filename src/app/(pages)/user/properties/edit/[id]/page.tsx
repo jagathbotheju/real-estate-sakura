@@ -6,7 +6,8 @@ import prisma from "@/lib/prisma";
 import { PropertyExt } from "@/types";
 import { Property, User } from "@prisma/client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import _ from "lodash";
 
 interface Props {
   params: {
@@ -36,8 +37,18 @@ const PropertyEditPage = async ({ params }: Props) => {
   const session = await auth();
   const user = session?.user as User;
 
+  console.log("PropertyEditPage property**********", property);
+
   if (!user) {
     redirect("/auth/signin");
+  }
+  if (
+    _.isEmpty(propertyTypes) ||
+    _.isEmpty(propertyStatuses) ||
+    _.isEmpty(property) ||
+    _.isEmpty(property.propertyLocation)
+  ) {
+    return notFound();
   }
 
   return (

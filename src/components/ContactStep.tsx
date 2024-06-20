@@ -20,10 +20,13 @@ import {
   PlusCircleIcon,
   PlusIcon,
 } from "lucide-react";
+import { PropertyExt } from "@/types";
 
 interface Props {
   className?: string;
   back: () => void;
+  isEdit: boolean;
+  property?: PropertyExt | null | undefined;
   setContactStepData: (formData: z.infer<typeof ContactStepSchema>) => void;
   formSubmit: (formData: z.infer<typeof ContactStepSchema>) => void;
 }
@@ -31,15 +34,17 @@ interface Props {
 const ContactStep = ({
   className,
   back,
+  property,
   setContactStepData,
   formSubmit,
+  isEdit,
 }: Props) => {
   const form = useForm<z.infer<typeof ContactStepSchema>>({
     resolver: zodResolver(ContactStepSchema),
     defaultValues: {
-      name: "",
-      phone: "",
-      email: "",
+      name: property && property.contact ? property.contact.name : "",
+      phone: property && property.contact ? property.contact.phone : "",
+      email: property && property.contact ? property.contact.email : "",
     },
     mode: "all",
   });
@@ -111,12 +116,12 @@ const ContactStep = ({
 
         {/* buttons */}
         <div className="flex gap-5 ml-auto pt-6">
-          <Button onClick={back}>
+          <Button onClick={back} type="button">
             <ChevronLeftIcon />
             Previous
           </Button>
           <Button disabled={!form.formState.isValid} type="submit">
-            Create Property
+            {isEdit ? "Update Property" : "Create Property"}
             <PlusCircleIcon className="ml-1" />
           </Button>
         </div>

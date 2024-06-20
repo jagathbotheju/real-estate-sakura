@@ -17,11 +17,13 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PropertyExt } from "@/types";
 
 interface Props {
   className?: string;
   next: () => void;
   back: () => void;
+  property?: PropertyExt | null | undefined;
   setLocationStepData: (formData: z.infer<typeof LocationStepSchema>) => void;
 }
 
@@ -29,17 +31,18 @@ const LocationStep = ({
   className,
   next,
   back,
+  property,
   setLocationStepData,
 }: Props) => {
   const form = useForm<z.infer<typeof LocationStepSchema>>({
     resolver: zodResolver(LocationStepSchema),
     defaultValues: {
-      address: "",
-      city: "",
-      postalCode: "",
-      district: "",
-      province: "",
-      landmark: "",
+      address: property ? property.propertyLocation.address : "",
+      city: property ? property.propertyLocation.city : "",
+      postalCode: property ? property.propertyLocation.postalCode : "",
+      district: property ? property.propertyLocation.district : "",
+      province: property ? property.propertyLocation.province : "",
+      landmark: property ? property.propertyLocation.landmark : "",
     },
     mode: "all",
   });
@@ -168,7 +171,7 @@ const LocationStep = ({
 
         {/* buttons */}
         <div className="flex gap-5 ml-auto col-span-2">
-          <Button onClick={back}>
+          <Button onClick={back} type="button">
             <ChevronLeftIcon />
             Previous
           </Button>
