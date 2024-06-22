@@ -158,3 +158,9 @@ enum Role {
   ADMIN
   USER
 }
+
+enum Plan{
+  BASIC
+  STANDARD
+  PREMIUM
+}

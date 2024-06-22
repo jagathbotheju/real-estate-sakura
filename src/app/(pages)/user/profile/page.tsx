@@ -7,6 +7,9 @@ import { UploadButton } from "@/lib/uploadthing";
 import { Edit2 } from "lucide-react";
 import { CloudUpload, Trash2 } from "lucide-react";
 import ImageUploadForm from "@/components/ImageUploadForm";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const ProfilePage = async () => {
   const session = await auth();
@@ -40,9 +43,14 @@ const ProfilePage = async () => {
         </div>
 
         <div className="flex flex-col border rounded-t-md mt-5 w-[70%] shadow-lg">
-          <h3 className="font-semibold text-lg bg-slate-200 p-3 text-muted-foreground">
-            Subscription Details
-          </h3>
+          <div className="flex justify-between items-center">
+            <h3 className="font-semibold text-lg bg-slate-200 p-3 text-muted-foreground">
+              Subscription
+            </h3>
+            <Link className={cn("mr-5", buttonVariants())} href="/subscription">
+              Subscribe
+            </Link>
+          </div>
         </div>
       </div>
     </div>

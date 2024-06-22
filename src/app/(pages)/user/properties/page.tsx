@@ -87,7 +87,7 @@ const PropertiesPage = async ({ searchParams }: Props) => {
             <Link href="/user/properties/add">NEW</Link>
           </Button>
         </div>
-        <Separator className="mt-5" />
+        <Separator className="mt-2 bg-slate-500" />
 
         {_.isEmpty(properties) ? (
           <>
